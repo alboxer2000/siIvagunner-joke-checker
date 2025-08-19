@@ -10,6 +10,7 @@
         /* Custom styles for a clean, modern look */
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Basic modal styles for the editor */
@@ -29,21 +30,15 @@
             align-items: center;
             justify-content: center;
         }
-        .modal-content {
-            background-color: #1e293b;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 600px;
-        }
     </style>
+    <!-- Add Font Awesome for the sun/moon icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
 
     <!-- Main application container -->
-    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl text-center">
-        
+    <div class="relative bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl text-center">
+
         <!-- Title and instructions -->
         <h1 class="text-3xl sm:text-4xl font-extrabold text-sky-400 mb-2">SiIvaGunner Joke Identifier</h1>
         <p class="text-slate-400 mb-6">Enter a video ID or exact title to see if its primary joke has been identified.</p>
@@ -84,7 +79,7 @@
 
     <!-- JSON Editor Modal -->
     <div id="jsonEditorModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content bg-slate-800">
             <h2 class="text-2xl font-bold text-sky-400 mb-4">Edit `jokes.json`</h2>
             <textarea 
                 id="jsonEditorTextarea" 
@@ -112,26 +107,44 @@
         // Use an IIFE (Immediately Invoked Function Expression) to avoid global scope pollution.
         (function() {
 
-            // === 1. Data Simulation: This code simulates fetching a jokes.json file.
-            // In a real browser environment, you would use a network request, but for this
-            // single-file app, we'll store the data locally.
-            // This is how the "jokes.json" file would look:
-            const simulatedJokesJson = [];
+            // === 1. Data Source ===
+            // URL for the remote jokes.json file.
+            const jokesJsonUrl = 'https://siivagunner-joke-checker.vercel.app/jokes.json';
 
             // A variable to hold our jokes data. It's initialized to null to show it's "loading".
             let jokesData = null;
 
-            // This async function simulates fetching the JSON data.
+            // This async function fetches the JSON data from the specified URL.
             async function fetchJokesData() {
                 try {
-                    // Simulate a network delay
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    // Parse the simulated JSON and store it.
-                    jokesData = simulatedJokesJson;
+                    // Start a loading message.
+                    resultDisplay.textContent = 'Loading joke data...';
+                    resultDisplay.classList.add('bg-slate-700', 'text-slate-300');
+
+                    // Fetch the data from the URL.
+                    const response = await fetch(jokesJsonUrl);
+                    
+                    // Check if the response was successful.
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    // Parse the JSON and store it.
+                    jokesData = await response.json();
+                    
+                    // Clear the loading message.
+                    resultDisplay.textContent = '';
+                    resultDisplay.classList.remove('bg-slate-700', 'text-slate-300');
+
                     console.log("Jokes data loaded successfully.");
                 } catch (error) {
+                    // This error is likely due to browser CORS policies, which can't be fixed in this file.
                     console.error("Failed to load jokes data:", error);
-                    jokesData = []; // Default to an empty array on error.
+                    jokesData = []; // Default to an empty array on error to prevent app from breaking.
+                    resultDisplay.textContent = 'Failed to load joke data from the internet. Using a blank list.';
+                    resultDisplay.classList.remove('bg-slate-700', 'text-slate-300');
+                    // Changed the background to a red tone for the error message.
+                    resultDisplay.classList.add('bg-red-900', 'text-red-300');
                 }
             }
 
@@ -165,7 +178,7 @@
                     return;
                 }
 
-                // Find the video entry in our simulated data.
+                // Find the video entry in our data.
                 const videoEntry = jokesData.find(video => video.id.toLowerCase() === videoId.toLowerCase() || video.title.toLowerCase().includes(videoId.toLowerCase()));
 
                 if (videoEntry) {
