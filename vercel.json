@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/jokes.json",
+      "destination": "/jokes.json"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/jokes.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    }
+  ]
+}
