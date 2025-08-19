@@ -46,7 +46,7 @@
         
         <!-- Title and instructions -->
         <h1 class="text-3xl sm:text-4xl font-extrabold text-sky-400 mb-2">SiIvaGunner Joke Identifier</h1>
-        <p class="text-slate-400 mb-6">Enter a video ID to see if its primary joke has been identified.</p>
+        <p class="text-slate-400 mb-6">Enter a video ID or exact title to see if its primary joke has been identified.</p>
 
         <!-- Input field and check button -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
@@ -112,9 +112,28 @@
         // Use an IIFE (Immediately Invoked Function Expression) to avoid global scope pollution.
         (function() {
 
-            // === 1. Data Simulation ===
-            // The jokesData array is now empty by default, as requested.
-            let jokesData = [];
+            // === 1. Data Simulation: This code simulates fetching a jokes.json file.
+            // In a real browser environment, you would use a network request, but for this
+            // single-file app, we'll store the data locally.
+            // This is how the "jokes.json" file would look:
+            const simulatedJokesJson = [];
+
+            // A variable to hold our jokes data. It's initialized to null to show it's "loading".
+            let jokesData = null;
+
+            // This async function simulates fetching the JSON data.
+            async function fetchJokesData() {
+                try {
+                    // Simulate a network delay
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Parse the simulated JSON and store it.
+                    jokesData = simulatedJokesJson;
+                    console.log("Jokes data loaded successfully.");
+                } catch (error) {
+                    console.error("Failed to load jokes data:", error);
+                    jokesData = []; // Default to an empty array on error.
+                }
+            }
 
             // === 2. DOM Element Selection ===
             const videoIdInput = document.getElementById('videoIdInput');
@@ -139,23 +158,41 @@
                     return;
                 }
 
+                // Check if the data has been loaded before trying to search.
+                if (!jokesData) {
+                    resultDisplay.textContent = 'Data is still loading. Please wait a moment.';
+                    resultDisplay.classList.add('bg-yellow-900', 'text-yellow-300');
+                    return;
+                }
+
                 // Find the video entry in our simulated data.
-                const videoEntry = jokesData.find(video => video.id === videoId);
+                const videoEntry = jokesData.find(video => video.id.toLowerCase() === videoId.toLowerCase() || video.title.toLowerCase().includes(videoId.toLowerCase()));
 
-                // Check if an entry was found and what its 'isIdentified' status is.
                 if (videoEntry) {
-                    // Check if a 'joke' property exists to include it in the display text.
-                    const jokeText = videoEntry.joke ? ` ("${videoEntry.joke}")` : "";
-
+                    // Only show the joke if it has been identified.
                     if (videoEntry.isIdentified) {
-                        resultDisplay.textContent = `Joke identified for video "${videoEntry.title}"${jokeText}.`;
+                        const jokeText = videoEntry.joke ? videoEntry.joke : "";
+                        let displayContent = `Joke identified for video "${videoEntry.title}".`;
+                        if (jokeText) {
+                            displayContent += `<br>Joke: ${jokeText}`;
+                        }
+                        if (videoEntry.date_discovered) {
+                            displayContent += `<br>Date Discovered: ${videoEntry.date_discovered}`;
+                        }
+                        if (videoEntry.time_after_release) {
+                            displayContent += `<br>Time After Release: ${videoEntry.time_after_release}`;
+                        }
+                        resultDisplay.innerHTML = displayContent;
+                        resultDisplay.classList.remove('bg-slate-700');
                         resultDisplay.classList.add('bg-green-900', 'text-green-300');
                     } else {
-                        resultDisplay.textContent = `Joke has NOT been identified for video "${videoEntry.title}"${jokeText}.`;
-                        resultDisplay.classList.add('bg-yellow-900', 'text-yellow-300');
+                        // If not identified, the message doesn't include the joke text.
+                        resultDisplay.textContent = `Joke has NOT been identified for video "${videoEntry.title}".`;
+                        resultDisplay.classList.remove('bg-slate-700');
+                        resultDisplay.classList.add('bg-red-900', 'text-red-300'); 
                     }
                 } else {
-                    resultDisplay.textContent = `No entry found for video ID "${videoId}".`;
+                    resultDisplay.textContent = `No entry found for video ID or title "${videoId}".`;
                     resultDisplay.classList.add('bg-red-900', 'text-red-300');
                 }
             });
@@ -221,6 +258,9 @@
                 jsonEditorModal.style.display = 'none';
                 editorMessage.textContent = ''; // Clear any previous error messages.
             });
+
+            // Immediately load the jokes data when the page loads.
+            fetchJokesData();
 
         })();
     </script>
