@@ -5,7 +5,8 @@
     "isIdentified": true,
     "joke": "Astronaut in the Ocean",
     "date_discovered": "2025-08-19",
-    "time_after_release": "3 minutes"
+    "time_after_release": "3 minutes",
+    "discovered by": "@arthur1zero1"
   },
   {
     "id": "ImKV_Q3X5P4",
@@ -19,7 +20,8 @@
     "isIdentified": true,
     "joke": "Mother 3",
     "date_discovered": "2025-08-19",
-    "time_after_release": "8 minutes"
+    "time_after_release": "8 minutes",
+    "discovered by": "@beauiduno"
   },
   {
     "id": "_gJE8POYCYg",
@@ -27,7 +29,8 @@
     "isIdentified": true,
     "joke": "I like to pump it and Dame tu cosita",
     "date_discovered": "2025-08-06",
-    "time_after_release": "4 hours"
+    "time_after_release": "4 hours",
+    "discovered by": "@BurningCorpsePersonal"
   },
   {
     "id": "k_BqPFeKmyw",
@@ -41,6 +44,7 @@
     "isIdentified": true,
     "joke": "Broke Boy, Nasty Nasty Girl, Damn Daniel, random meme sound effects and other",
     "date_discovered": "2025-08-19",
-    "time_after_release": "3 minutes"
+    "time_after_release": "3 minutes",
+    "discovered by": "alboxer2000 (the maker of the website)"
   }
 ]
