@@ -193,9 +193,9 @@
                         if (videoEntry.date_discovered) {
                             displayContent += `<br>Date Discovered: ${videoEntry.date_discovered}`;
                         }
-                        // Add the new "discovered by" field to the display before "Time After Release"
-                        if (videoEntry.discovered_by) {
-                            displayContent += `<br>Discovered By: ${videoEntry.discovered_by}`;
+                        // Use bracket notation to access the property with a space in its name.
+                        if (videoEntry['discovered by']) {
+                            displayContent += `<br>Discovered By: ${videoEntry['discovered by']}`;
                         }
                         if (videoEntry.time_after_release) {
                             displayContent += `<br>Time After Release: ${videoEntry.time_after_release}`;
