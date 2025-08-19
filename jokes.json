@@ -12,5 +12,13 @@
     "title": "Here We Are (NTSC Mix) - Undertale",
     "isIdentified": false,
     "joke": null
+  },
+  {
+    "id": "l-3GDaBjUUU",
+    "title": "KING OF ROLYPOLY (Beta Mix) - Deltarune",
+    "isIdentified": true,
+    "joke": "Mother 3",
+    "date_discovered": "2025-08-19",
+    "time_after_release": "8 minutes"
   }
 ]
