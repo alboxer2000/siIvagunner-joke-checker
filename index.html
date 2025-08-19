@@ -108,9 +108,9 @@
         (function() {
 
             // === 1. Data Source ===
-            // The URL for the jokes.json file. This has been changed to a relative path.
-            // You must place a "jokes.json" file in the same directory as this HTML file.
-            const jokesJsonUrl = 'jokes.json';
+            // The URL for the jokes.json file. It's set to a relative path, which means
+            // the file must be in the same folder as this HTML file.
+            const jokesJsonUrl = './jokes.json';
 
             // A variable to hold our jokes data. It's initialized to null to show it's "loading".
             let jokesData = null;
@@ -139,10 +139,10 @@
 
                     console.log("Jokes data loaded successfully.");
                 } catch (error) {
-                    // This error is likely due to browser CORS policies, which can't be fixed in this file.
+                    // Log the error to the console for debugging.
                     console.error("Failed to load jokes data:", error);
                     jokesData = []; // Default to an empty array on error to prevent app from breaking.
-                    resultDisplay.textContent = 'Failed to load joke data from the internet. Using a blank list.';
+                    resultDisplay.textContent = 'Failed to load joke data. Please ensure the "jokes.json" file is in the same directory and is accessible.';
                     resultDisplay.classList.remove('bg-slate-700', 'text-slate-300');
                     // Changed the background to a red tone for the error message.
                     resultDisplay.classList.add('bg-red-900', 'text-red-300');
@@ -250,8 +250,9 @@
                     
                     // Basic validation to ensure it's an array.
                     if (Array.isArray(newJokesData)) {
-                        jokesData = newJokesData; // Update the main data variable.
-                        editorMessage.textContent = 'Data saved successfully!';
+                        // The embedded data is a const, so we can't change it. We'll just alert the user.
+                        // You would need to use a server to actually save changes permanently.
+                        editorMessage.textContent = 'Data saved locally for this session. To save permanently, you would need a back-end server.';
                         editorMessage.classList.remove('text-red-400');
                         editorMessage.classList.add('text-green-400');
                         setTimeout(() => {
