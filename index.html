@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiIvaGunner Joke Checker</title>
+    <!-- Use the Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a clean, modern look */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Basic modal styles for the editor */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #1e293b;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 600px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main application container -->
+    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl text-center">
+        
+        <!-- Title and instructions -->
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-sky-400 mb-2">SiIvaGunner Joke Identifier</h1>
+        <p class="text-slate-400 mb-6">Enter a video ID to see if its primary joke has been identified.</p>
+
+        <!-- Input field and check button -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <input 
+                id="videoIdInput" 
+                type="text" 
+                placeholder="Enter a video ID or exact title..." 
+                class="flex-grow p-3 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+            >
+            <button 
+                id="checkButton" 
+                class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+                Check Video
+            </button>
+        </div>
+
+        <!-- Result display area -->
+        <div 
+            id="resultDisplay" 
+            class="text-lg font-semibold text-center p-4 rounded-lg transition-all duration-300"
+        >
+            <!-- Results will be displayed here -->
+        </div>
+
+        <!-- Button to open the JSON editor, initially hidden -->
+        <button 
+            id="editorButton" 
+            class="mt-8 bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-500 hidden"
+        >
+            Open JSON Editor
+        </button>
+
+    </div>
+
+    <!-- JSON Editor Modal -->
+    <div id="jsonEditorModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold text-sky-400 mb-4">Edit `jokes.json`</h2>
+            <textarea 
+                id="jsonEditorTextarea" 
+                class="w-full h-80 p-4 rounded-lg bg-slate-700 text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-500"
+            ></textarea>
+            <div class="flex justify-end gap-4 mt-4">
+                <button 
+                    id="saveButton" 
+                    class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105"
+                >
+                    Save Changes
+                </button>
+                <button 
+                    id="closeButton" 
+                    class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105"
+                >
+                    Close
+                </button>
+            </div>
+            <p id="editorMessage" class="mt-4 text-sm text-red-400"></p>
+        </div>
+    </div>
+    
+    <script>
+        // Use an IIFE (Immediately Invoked Function Expression) to avoid global scope pollution.
+        (function() {
+
+            // === 1. Data Simulation ===
+            // The jokesData array is now empty by default, as requested.
+            let jokesData = [];
+
+            // === 2. DOM Element Selection ===
+            const videoIdInput = document.getElementById('videoIdInput');
+            const checkButton = document.getElementById('checkButton');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const editorButton = document.getElementById('editorButton');
+            const jsonEditorModal = document.getElementById('jsonEditorModal');
+            const jsonEditorTextarea = document.getElementById('jsonEditorTextarea');
+            const saveButton = document.getElementById('saveButton');
+            const closeButton = document.getElementById('closeButton');
+            const editorMessage = document.getElementById('editorMessage');
+
+            // === 3. Main Functionality: Video Check ===
+            // Event listener for the "Check Video" button click.
+            checkButton.addEventListener('click', () => {
+                const videoId = videoIdInput.value.trim();
+                resultDisplay.className = 'text-lg font-semibold text-center p-4 rounded-lg transition-all duration-300';
+                
+                if (videoId === '') {
+                    resultDisplay.textContent = 'Please enter a video ID.';
+                    resultDisplay.classList.add('bg-red-900', 'text-red-300');
+                    return;
+                }
+
+                // Find the video entry in our simulated data.
+                const videoEntry = jokesData.find(video => video.id === videoId);
+
+                // Check if an entry was found and what its 'isIdentified' status is.
+                if (videoEntry) {
+                    // Check if a 'joke' property exists to include it in the display text.
+                    const jokeText = videoEntry.joke ? ` ("${videoEntry.joke}")` : "";
+
+                    if (videoEntry.isIdentified) {
+                        resultDisplay.textContent = `Joke identified for video "${videoEntry.title}"${jokeText}.`;
+                        resultDisplay.classList.add('bg-green-900', 'text-green-300');
+                    } else {
+                        resultDisplay.textContent = `Joke has NOT been identified for video "${videoEntry.title}"${jokeText}.`;
+                        resultDisplay.classList.add('bg-yellow-900', 'text-yellow-300');
+                    }
+                } else {
+                    resultDisplay.textContent = `No entry found for video ID "${videoId}".`;
+                    resultDisplay.classList.add('bg-red-900', 'text-red-300');
+                }
+            });
+
+            // === 4. JSON Editor Functionality ===
+            const unlockKey = 'modificaeditor';
+            let typedString = '';
+            
+            // Event listener to check for the secret phrase to unlock the editor button.
+            document.addEventListener('keydown', (e) => {
+                // Get the typed key and convert to lowercase for case-insensitive matching.
+                const key = e.key.toLowerCase();
+                
+                // Append the typed key to our tracking string.
+                typedString += key;
+
+                // Keep the string from growing indefinitely by only keeping the last part.
+                if (typedString.length > unlockKey.length) {
+                    typedString = typedString.slice(-unlockKey.length);
+                }
+
+                // If the typed string matches the unlock key, show the button.
+                if (typedString === unlockKey) {
+                    editorButton.classList.remove('hidden');
+                    typedString = ''; // Reset the typed string so the button only appears once per typing.
+                }
+            });
+
+            // Event listener to open the modal when the editor button is clicked.
+            editorButton.addEventListener('click', () => {
+                // Populate the textarea with the current jokes data, formatted for readability.
+                jsonEditorTextarea.value = JSON.stringify(jokesData, null, 2);
+                jsonEditorModal.style.display = 'flex'; // Show the modal.
+            });
+
+            // Event listener for the save button inside the modal.
+            saveButton.addEventListener('click', () => {
+                try {
+                    // Attempt to parse the JSON from the textarea.
+                    const newJokesData = JSON.parse(jsonEditorTextarea.value);
+                    
+                    // Basic validation to ensure it's an array.
+                    if (Array.isArray(newJokesData)) {
+                        jokesData = newJokesData; // Update the main data variable.
+                        editorMessage.textContent = 'Data saved successfully!';
+                        editorMessage.classList.remove('text-red-400');
+                        editorMessage.classList.add('text-green-400');
+                        setTimeout(() => {
+                            jsonEditorModal.style.display = 'none'; // Hide the modal after a short delay.
+                        }, 1000);
+                    } else {
+                        throw new Error('JSON is not a valid array.');
+                    }
+                } catch (error) {
+                    // Display an error message if parsing fails.
+                    editorMessage.textContent = `Invalid JSON: ${error.message}`;
+                    editorMessage.classList.add('text-red-400');
+                }
+            });
+
+            // Event listener to close the modal.
+            closeButton.addEventListener('click', () => {
+                jsonEditorModal.style.display = 'none';
+                editorMessage.textContent = ''; // Clear any previous error messages.
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
